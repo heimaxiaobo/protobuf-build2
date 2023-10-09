@@ -1,0 +1,35 @@
+name: Windows
+on: workflow_dispatch
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: windows-2022
+    steps:
+      - name: Checkout protobuf
+        uses: actions/checkout@v4
+        with:
+          repository: protocolbuffers/protobuf
+          ref: v3.24.3
+          path: protobuf
+          submodules: true
+      - name: Init MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Build protobuf
+        run: |
+          cd protobuf
+          mkdir build
+          cd build
+          cmake ../ -DBUILD_SHARED_LIBS=ON -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_WITH_ZLIB=OFF
+          cmake --build . --config Debug
+          cmake --install . --config Debug --prefix install/Debug
+          cmake --build . --config Release
+          cmake --install . --config Release --prefix install/Release
+      - name: Generate zip
+        run: |
+          echo ${{ github.sha }} > Release.txt
+          Compress-Archive -Path ./protobuf/build/install/*,./Release.txt -DestinationPath protobuf.zip
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: protobuf.zip
