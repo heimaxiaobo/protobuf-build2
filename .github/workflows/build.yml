@@ -1,0 +1,71 @@
+name: Build
+on: workflow_dispatch
+jobs:
+  Windows:
+    permissions:
+      contents: write
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: protocolbuffers/protobuf
+          ref: v3.24.3
+          path: protobuf
+          submodules: true
+      - name: Init MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Build protobuf
+        run: |
+          cd protobuf
+          mkdir build
+          cd build
+          cmake ../ -DBUILD_SHARED_LIBS=ON -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_WITH_ZLIB=OFF
+          cmake --build . --config Debug
+          cmake --install . --config Debug --prefix install/Debug
+          cmake --build . --config Release
+          cmake --install . --config Release --prefix install/Release
+      - name: Generate zip
+        run: |
+          echo ${{ github.sha }} > Release.txt
+          Compress-Archive -Path ./protobuf/build/install/*,./Release.txt -DestinationPath protobuf.win.${{ github.ref_name }}.zip
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: protobuf.win.${{ github.ref_name }}.zip
+  Linux:
+    permissions:
+      contents: write
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: protocolbuffers/protobuf
+          ref: v3.24.3
+          path: protobuf
+          submodules: true
+      - name: Install deps
+        run: |
+          sudo apt-get -y install gcc-10 g++-10
+          alias gcc='gcc-10'
+          alias g++='g++-10'
+          export CC=`which gcc-10`
+          export CXX=`which gcc-10`
+      - name: Build
+        run: |
+          cd protobuf
+          mkdir build
+          cd build
+          cmake .. -B Release -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_WITH_ZLIB=OFF
+          cmake --build Release
+          cmake --install Release --prefix install/Release
+      - name: Generate tar
+        run: |
+          echo ${{ github.sha }} > Release.txt
+          cp Release.txt ./protobuf/build/install/Release
+          tar -czvf protobuf.linux.${{ github.ref_name }}.tar.gz -C ./protobuf/build/install/Release .
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: protobuf.linux.${{ github.ref_name }}.tar.gz
