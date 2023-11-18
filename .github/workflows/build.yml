@@ -94,6 +94,6 @@ jobs:
             echo ${{ github.sha }} > Release.txt
             Compress-Archive -Path ./protobuf/build/install/*,./Release.txt -DestinationPath protobuf.android.${{ github.ref_name }}.zip
       - name: Release
-          uses: softprops/action-gh-release@v1
-          with:
-            files: protobuf.android.${{ github.ref_name }}.zip
+        uses: softprops/action-gh-release@v1
+        with:
+          files: protobuf.android.${{ github.ref_name }}.zip
