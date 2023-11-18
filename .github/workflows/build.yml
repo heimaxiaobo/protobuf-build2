@@ -72,7 +72,7 @@ jobs:
   Android:
     permissions:
       contents: write
-    runs-on: windows-2022
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -86,13 +86,14 @@ jobs:
           cd protobuf
           mkdir build
           cd build
-          cmake .. -DCMAKE_TOOLCHAIN_FILE="C:/Android/android-sdk/ndk/23.2.8568313/build/cmake/android.toolchain.cmake" -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-21 -DCMAKE_BUILD_TYPE=Release -G "Ninja" -DBUILD_SHARED_LIBS=OFF -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_WITH_ZLIB=OFF -Dprotobuf_BUILD_PROTOC_BINARIES=OFF
+          cmake .. -DCMAKE_TOOLCHAIN_FILE="/usr/local/lib/android/sdk/ndk/23.2.8568313/build/cmake/android.toolchain.cmake" -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-21 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_WITH_ZLIB=OFF -Dprotobuf_BUILD_PROTOC_BINARIES=OFF
           cmake --build .
           cmake --install . --prefix install
       - name: Generate zip
         run: |
-            echo ${{ github.sha }} > Release.txt
-            Compress-Archive -Path ./protobuf/build/install/*,./Release.txt -DestinationPath protobuf.android.${{ github.ref_name }}.zip
+            echo ${{ github.sha }} > ./protobuf/build/install/Release.txt
+            cd protobuf/build/install
+            zip -r ../../../protobuf.android.${{ github.ref_name }}.zip *
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
