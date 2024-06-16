@@ -69,6 +69,35 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: protobuf.linux.${{ github.ref_name }}.tar.gz
+  macOS:
+    permissions:
+      contents: write
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: protocolbuffers/protobuf
+          ref: v3.24.3
+          path: protobuf
+          submodules: true
+      - name: Build
+        run: |
+          cd protobuf
+          mkdir build
+          cd build
+          cmake .. -B Release -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_WITH_ZLIB=OFF -DCMAKE_CXX_STANDARD=17
+          cmake --build Release
+          cmake --install Release --prefix install/Release
+      - name: Generate tar
+        run: |
+          echo ${{ github.sha }} > Release.txt
+          cp Release.txt ./protobuf/build/install/Release
+          tar -czvf protobuf.macos.${{ github.ref_name }}.tar.gz -C ./protobuf/build/install/Release .
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: protobuf.macos.${{ github.ref_name }}.tar.gz
   Android:
     permissions:
       contents: write
