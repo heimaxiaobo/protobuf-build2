@@ -93,11 +93,11 @@ jobs:
         run: |
           echo ${{ github.sha }} > Release.txt
           cp Release.txt ./protobuf/build/install/Release
-          tar -czvf protobuf.macos.${{ github.ref_name }}.tar.gz -C ./protobuf/build/install/Release .
+          tar -czvf protobuf.mac.${{ github.ref_name }}.tar.gz -C ./protobuf/build/install/Release .
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: protobuf.macos.${{ github.ref_name }}.tar.gz
+          files: protobuf.mac.${{ github.ref_name }}.tar.gz
   Android:
     permissions:
       contents: write
