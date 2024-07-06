@@ -20,7 +20,7 @@ jobs:
           cd protobuf
           mkdir build
           cd build
-          cmake ../ -DBUILD_SHARED_LIBS=ON -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_WITH_ZLIB=OFF
+          cmake ../ -DBUILD_SHARED_LIBS=OFF -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_WITH_ZLIB=OFF
           cmake --build . --config Debug
           cmake --install . --config Debug --prefix install/Debug
           cmake --build . --config Release
@@ -57,7 +57,7 @@ jobs:
           cd protobuf
           mkdir build
           cd build
-          cmake .. -B Release -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_WITH_ZLIB=OFF
+          cmake .. -B Release -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_WITH_ZLIB=OFF
           cmake --build Release
           cmake --install Release --prefix install/Release
       - name: Generate tar
@@ -86,7 +86,7 @@ jobs:
           cd protobuf
           mkdir build
           cd build
-          cmake .. -B Release -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_WITH_ZLIB=OFF -DCMAKE_CXX_STANDARD=17
+          cmake .. -B Release -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_WITH_ZLIB=OFF -DCMAKE_CXX_STANDARD=17
           cmake --build Release
           cmake --install Release --prefix install/Release
       - name: Generate tar
